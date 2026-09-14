@@ -34,8 +34,24 @@
     color:var(--crema);
     padding:1.5rem 1.25rem 1.75rem;
   }
+  .encabezado{
+    max-width:680px;margin:0 auto;display:flex;align-items:center;gap:1rem;
+  }
+  .logo-negocio{
+    width:104px;height:104px;flex:0 0 104px;object-fit:cover;
+    border-radius:50%;border:4px solid var(--crema);
+    background:var(--blanco);box-shadow:0 5px 18px rgba(0,0,0,.22);
+  }
   header h1{font-size:2.1rem;}
   header p{margin:.3rem 0 0;opacity:.85;font-size:.95rem;}
+
+  @media (max-width:480px){
+    header{padding:1.1rem 1rem 1.25rem;}
+    .encabezado{gap:.8rem;}
+    .logo-negocio{width:82px;height:82px;flex-basis:82px;border-width:3px;}
+    header h1{font-size:1.85rem;line-height:1.05;}
+    header p{font-size:.88rem;line-height:1.35;}
+  }
 
   main{max-width:680px;margin:0 auto;padding:1.25rem;}
 
@@ -96,8 +112,13 @@
 <body>
 
 <header>
-  <h1>Catálogo de pedidos</h1>
-  <p>Elegí tus productos y armá tu pedido.</p>
+  <div class="encabezado">
+    <img class="logo-negocio" src="logo-ceviche-mango.jpeg" alt="Logo de Ceviche de Mango">
+    <div>
+      <h1>Catálogo de pedidos</h1>
+      <p>Elegí tus productos y armá tu pedido.</p>
+    </div>
+  </div>
 </header>
 
 <main>
