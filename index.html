@@ -107,7 +107,7 @@
 <script>
   const CONFIG_APP_URL='https://script.google.com/macros/s/AKfycbxmhvQRhPukChM8PSwFVnRjRFk7r4rCPZ0W2UFELZb6WfojcPFbwASZ-uY174noJdLq/exec';
   const CONFIG_WHATSAPP_NEGOCIO='';
-  const API_TIMEOUT_MS=15000;
+  const API_TIMEOUT_MS=30000;
   let catalogo=[];
   let carrito=cargarCarrito();
   let clienteActual={telefono:'',nombre:'',direccion:'',gps:''};
@@ -119,10 +119,15 @@
   function formatearTelefono(valor){const digitos=String(valor||'').replace(/\D/g,'').slice(0,8);return digitos.length>4?digitos.slice(0,4)+'-'+digitos.slice(4):digitos}
   function mostrarMensaje(id,texto,tipo='info'){const elemento=$(id);elemento.textContent=texto||'';elemento.className='estado-mensaje'+(texto?' visible '+tipo:'')}
   function mostrarPaso(id){document.querySelectorAll('.paso').forEach(paso=>paso.classList.remove('activo'));$(id).classList.add('activo');window.scrollTo({top:0,behavior:'smooth'})}
-  async function apiJson(url,opciones={}){
+  async function apiJson(url,opciones={},intento=0){
     const controlador=new AbortController();const temporizador=setTimeout(()=>controlador.abort(),API_TIMEOUT_MS);
     try{const respuesta=await fetch(url,{...opciones,signal:controlador.signal});if(!respuesta.ok)throw new Error('HTTP '+respuesta.status);const datos=await respuesta.json();if(datos&&datos.error)throw new Error(datos.error);return datos}
-    catch(error){if(error.name==='AbortError')throw new Error('La conexión tardó demasiado. Intentá nuevamente.');throw error}finally{clearTimeout(temporizador)}
+    catch(error){
+      const metodo=String(opciones.method||'GET').toUpperCase();
+      if(intento<1&&metodo==='GET'){await new Promise(resolve=>setTimeout(resolve,800));return apiJson(url,opciones,intento+1)}
+      if(error.name==='AbortError')throw new Error('El servicio está tardando más de lo normal. Intentá nuevamente.');
+      throw error
+    }finally{clearTimeout(temporizador)}
   }
   function cargarCarrito(){try{return JSON.parse(localStorage.getItem('queMangoCarrito')||'{}')}catch{return {}}}
   function guardarCarrito(){localStorage.setItem('queMangoCarrito',JSON.stringify(carrito))}
@@ -131,7 +136,8 @@
     if(!telefono){mostrarMensaje('mensaje-telefono','Ingresá un número válido de 8 dígitos.','error');$('telefono').focus();return}
     const boton=$('btn-continuar');boton.disabled=true;boton.textContent='Cargando…';mostrarMensaje('mensaje-telefono','');clienteActual.telefono=telefono;localStorage.setItem('queMangoTelefono',telefono);
     try{
-      const [datosCliente,productos,config]=await Promise.all([apiJson(CONFIG_APP_URL+'?action=cliente&telefono='+encodeURIComponent(telefono)),apiJson(CONFIG_APP_URL+'?action=catalogo'),apiJson(CONFIG_APP_URL+'?action=config')]);
+      const productos=await apiJson(CONFIG_APP_URL+'?action=catalogo');
+      const [datosCliente,config]=await Promise.all([apiJson(CONFIG_APP_URL+'?action=cliente&telefono='+encodeURIComponent(telefono)),apiJson(CONFIG_APP_URL+'?action=config')]);
       configuracion={...configuracion,...(config||{})};
       if(configuracion.PedidosAbiertos===false)throw new Error('La recepción de pedidos está cerrada por el momento. Volvé a intentarlo más tarde.');
       if(!Array.isArray(productos)||!productos.length)throw new Error('El catálogo no tiene productos disponibles.');
