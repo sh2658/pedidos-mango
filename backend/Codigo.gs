@@ -3,10 +3,10 @@
  * Google Sheets + Apps Script + GitHub Pages
  */
 const HOJAS = Object.freeze({
-  PRODUCTOS: 'PRODUCTOS',
-  CLIENTES: 'CLIENTES',
-  PEDIDOS: 'PEDIDOS',
-  CONFIG: 'CONFIG',
+  PRODUCTOS: 'Productos',
+  CLIENTES: 'Clientes',
+  PEDIDOS: 'Pedidos',
+  CONFIG: 'Config',
   RESUMEN: 'Resumen'
 });
 
