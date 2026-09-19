@@ -41,9 +41,14 @@
   .precio{color:var(--verde-oscuro);font-weight:700;margin-top:.12rem}.unidad{color:var(--gris);font-size:.8rem}.cantidad{display:flex;align-items:center;gap:.38rem}
   .cantidad button{width:42px;height:42px;border:0;border-radius:8px;background:var(--mostaza);color:var(--carbon);font-size:1.25rem;font-weight:700;cursor:pointer}
   .cantidad span{min-width:1.5rem;text-align:center;font-weight:700}
+  .cantidad .btn-elegir-sabores{width:auto;height:auto;font-size:.87rem;padding:.68rem .8rem;line-height:1.1}.contador-selecciones{font-size:.78rem;color:var(--gris)}
+  .modal{position:fixed;inset:0;z-index:30;display:none;align-items:flex-end;background:rgba(21,58,49,.52);padding:1rem}.modal.visible{display:flex}.modal-contenido{width:min(760px,100%);max-height:90vh;overflow:auto;margin:auto;background:var(--crema);border-radius:18px;padding:1.15rem;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+  .modal-cabecera{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.85rem}.modal-cabecera p{margin:.25rem 0 0;color:var(--gris);font-size:.87rem}.btn-cerrar{width:38px;height:38px;border:0;border-radius:50%;background:var(--verde-suave);color:var(--verde-oscuro);font-size:1.35rem;cursor:pointer}
+  .sabores{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.sabor{display:grid;grid-template-columns:64px minmax(0,1fr);gap:.65rem;align-items:center;padding:.55rem;border:1px solid var(--borde);border-radius:11px;background:var(--blanco)}.sabor-foto{width:64px;height:70px;object-fit:cover;border-radius:8px;background:var(--verde-suave)}.sabor-nombre{font-size:.9rem;font-weight:700}.sabor-categoria{display:block;color:var(--gris);font-size:.72rem}.sabor-controles{display:flex;align-items:center;gap:.32rem;margin-top:.35rem}.sabor-controles button{width:28px;height:28px;border:0;border-radius:7px;background:var(--mostaza);font-size:1rem;font-weight:800;cursor:pointer}.sabor-controles button:disabled{opacity:.42;cursor:not-allowed}.sabor-controles span{min-width:1.25rem;text-align:center;font-weight:800}.selector-pie{position:sticky;bottom:-1.15rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem;margin:1rem -1.15rem -1.15rem;padding:1rem 1.15rem;background:var(--blanco);border-top:1px solid var(--borde)}.selector-resumen{color:var(--verde-oscuro);font-size:.88rem;font-weight:800}
   .carrito-flotante{position:sticky;bottom:calc(.5rem + env(safe-area-inset-bottom));z-index:5;display:none;align-items:center;justify-content:space-between;gap:1rem;margin-top:1rem;padding:.9rem 1rem;border-radius:12px;background:var(--verde);color:var(--crema);box-shadow:0 10px 28px rgba(21,58,49,.28)}
   .carrito-flotante.visible{display:flex}.carrito-total{font-size:.78rem;opacity:.83}.resumen-lista{margin:1rem 0}
   .resumen-item{display:flex;justify-content:space-between;gap:1rem;padding:.65rem 0;border-bottom:1px solid var(--borde)}
+  .btn-eliminar-linea{margin-top:.42rem;border:0;background:transparent;color:var(--error);padding:0;font-size:.78rem;font-weight:700;cursor:pointer}
   .total{display:flex;justify-content:space-between;margin-top:.85rem;font-size:1.12rem;font-weight:800}
   .aviso{margin-bottom:1rem;padding:.8rem .9rem;border:1px solid var(--mostaza);border-radius:8px;background:#FFF8E8;color:#6B5218;font-size:.85rem}
   .confirmacion{text-align:center;padding:1.75rem 1rem}.confirmacion-icono{width:64px;height:64px;display:grid;place-items:center;margin:0 auto .8rem;border-radius:50%;background:var(--verde-suave);color:var(--exito);font-size:2rem;font-weight:800}
@@ -51,7 +56,7 @@
   .pedido-estado{margin-top:.8rem;padding:1rem;border:1px solid var(--borde);border-radius:10px;background:var(--blanco)}
   .pedido-estado-cabecera{display:flex;justify-content:space-between;gap:1rem;align-items:center}.etiqueta-estado{padding:.25rem .55rem;border-radius:999px;background:var(--verde-suave);color:var(--verde-oscuro);font-size:.76rem;font-weight:800}
   .pedido-productos{margin:.6rem 0 0;padding-left:1.2rem;color:var(--gris);font-size:.88rem}.pie{max-width:760px;margin:0 auto;padding:0 1.25rem 1.5rem;text-align:center;color:var(--gris);font-size:.78rem}.oculto{display:none!important}
-  @media(max-width:560px){.encabezado-sitio{padding-left:1rem;padding-right:1rem}.logo-negocio{width:78px;height:78px;flex-basis:78px;border-width:3px}h1{font-size:1.85rem}.encabezado-sitio p{font-size:.86rem}main{padding:1rem 1rem 2rem}.tarjeta{padding:1rem}.producto{grid-template-columns:88px minmax(0,1fr);gap:.75rem}.producto-foto{width:88px;height:96px}.cantidad{grid-column:1/-1;justify-content:flex-end;border-top:1px solid var(--borde);padding-top:.65rem}.acciones .btn{flex:1 1 100%}.encabezado-paso{align-items:flex-start}}
+  @media(max-width:560px){.encabezado-sitio{padding-left:1rem;padding-right:1rem}.logo-negocio{width:78px;height:78px;flex-basis:78px;border-width:3px}h1{font-size:1.85rem}.encabezado-sitio p{font-size:.86rem}main{padding:1rem 1rem 2rem}.tarjeta{padding:1rem}.producto{grid-template-columns:88px minmax(0,1fr);gap:.75rem}.producto-foto{width:88px;height:96px}.cantidad{grid-column:1/-1;justify-content:flex-end;border-top:1px solid var(--borde);padding-top:.65rem}.acciones .btn{flex:1 1 100%}.encabezado-paso{align-items:flex-start}.sabores{grid-template-columns:1fr}.modal{padding:0}.modal-contenido{max-height:94vh;border-radius:18px 18px 0 0}.selector-pie{bottom:-1.15rem}}
 </style>
 </head>
 <body>
@@ -77,6 +82,11 @@
     <div class="carrito-flotante" id="barra-carrito" aria-live="polite"><div><strong id="resumen-carrito">0 productos</strong><div id="subtotal-carrito" class="carrito-total">₡0</div></div>
       <button id="btn-ver-pedido" class="btn btn-mostaza" type="button">Ver pedido</button></div>
   </section>
+  <div id="modal-sabores" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="titulo-selector-sabores">
+    <div class="modal-contenido"><div class="modal-cabecera"><div><h2 id="titulo-selector-sabores">Elegí los sabores</h2><p id="instruccion-selector-sabores"></p></div><button id="btn-cerrar-selector" class="btn-cerrar" type="button" aria-label="Cerrar selector">×</button></div>
+      <div id="lista-sabores" class="sabores"></div><div class="selector-pie"><span id="resumen-selector-sabores" class="selector-resumen"></span><button id="btn-agregar-combinacion" class="btn btn-primario" type="button" disabled>Agregar combinación</button></div>
+    </div>
+  </div>
   <section id="paso-checkout" class="paso">
     <div class="encabezado-paso"><div><h2>Confirmar pedido</h2><p>Revisá los datos antes de enviarlo.</p></div>
       <button class="enlace-volver" type="button" data-ir="paso-catalogo">Volver</button></div>
@@ -108,10 +118,11 @@
   const CONFIG_APP_URL='https://script.google.com/macros/s/AKfycbxmhvQRhPukChM8PSwFVnRjRFk7r4rCPZ0W2UFELZb6WfojcPFbwASZ-uY174noJdLq/exec';
   const CONFIG_WHATSAPP_NEGOCIO='';
   const API_TIMEOUT_MS=30000;
-  let catalogo=[];
+  let catalogo=[],sabores=[];
   let carrito=cargarCarrito();
   let clienteActual={telefono:'',nombre:'',direccion:'',gps:''};
   let configuracion={PedidosAbiertos:true,MontoMinimo:0,WhatsAppNegocio:''};
+  let productoEnSeleccion=null,seleccionEnCurso={};
   const $=id=>document.getElementById(id);
   const moneda=valor=>'₡'+Number(valor||0).toLocaleString('es-CR');
   function escapar(valor){return String(valor??'').replace(/[&<>"']/g,caracter=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[caracter]))}
@@ -136,7 +147,9 @@
     if(!telefono){mostrarMensaje('mensaje-telefono','Ingresá un número válido de 8 dígitos.','error');$('telefono').focus();return}
     const boton=$('btn-continuar');boton.disabled=true;boton.textContent='Cargando…';mostrarMensaje('mensaje-telefono','');clienteActual.telefono=telefono;localStorage.setItem('queMangoTelefono',telefono);
     try{
-      const productos=await apiJson(CONFIG_APP_URL+'?action=catalogo');
+      const respuestaCatalogo=await apiJson(CONFIG_APP_URL+'?action=catalogo');
+      const productos=Array.isArray(respuestaCatalogo)?respuestaCatalogo:respuestaCatalogo?.productos;
+      sabores=Array.isArray(respuestaCatalogo?.sabores)?respuestaCatalogo.sabores:[];
       const [datosCliente,config]=await Promise.all([apiJson(CONFIG_APP_URL+'?action=cliente&telefono='+encodeURIComponent(telefono)),apiJson(CONFIG_APP_URL+'?action=config')]);
       configuracion={...configuracion,...(config||{})};
       if(configuracion.PedidosAbiertos===false)throw new Error('La recepción de pedidos está cerrada por el momento. Volvé a intentarlo más tarde.');
@@ -146,29 +159,61 @@
     }catch(error){mostrarMensaje('mensaje-telefono',error.message||'No pudimos cargar el catálogo. Intentá nuevamente.','error')}
     finally{boton.disabled=false;boton.textContent='Ver productos'}
   }
-  function depurarCarrito(){const ids=new Set(catalogo.map(p=>String(p.ID_Producto)));Object.keys(carrito).forEach(id=>{if(!ids.has(id))delete carrito[id]});guardarCarrito()}
+  function depurarCarrito(){const ids=new Set(catalogo.map(p=>String(p.ID_Producto)));Object.keys(carrito).forEach(clave=>{if(!ids.has(String(carrito[clave]?.ID_Producto)))delete carrito[clave]});guardarCarrito()}
   function fotoProducto(producto){const url=String(producto.Foto||'').trim();if(/^https:\/\//i.test(url))return '<img class="producto-foto" src="'+escapar(url)+'" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;producto-foto&quot; aria-hidden=&quot;true&quot;>🥭</div>\'">';return '<div class="producto-foto" aria-hidden="true">🥭</div>'}
   function dibujarCatalogo(){
     $('cantidad-productos').textContent=catalogo.length+(catalogo.length===1?' producto disponible':' productos disponibles');
-    $('lista-productos').innerHTML=catalogo.map(producto=>{const id=escapar(producto.ID_Producto);const cantidad=carrito[producto.ID_Producto]?.Cantidad||0;
-      return '<article class="producto" data-id="'+id+'">'+fotoProducto(producto)+'<div class="producto-info"><h3>'+escapar(producto.Nombre)+'</h3><div class="precio">'+moneda(producto.Precio)+'</div><div class="unidad">'+escapar(producto.Unidad||'')+'</div></div><div class="cantidad"><button type="button" data-delta="-1" aria-label="Quitar uno">−</button><span aria-live="polite">'+cantidad+'</span><button type="button" data-delta="1" aria-label="Agregar uno">+</button></div></article>'
+    $('lista-productos').innerHTML=catalogo.map(producto=>{const id=escapar(producto.ID_Producto),requiereSabores=Number(producto.CantidadSabores||0)>0, cantidad=contarProductoEnCarrito(producto.ID_Producto);
+      const control=requiereSabores?'<button class="btn btn-mostaza btn-elegir-sabores" type="button" data-elegir-sabores="'+id+'">Elegir sabores</button><span class="contador-selecciones" aria-live="polite">'+cantidad+' '+(cantidad===1?'selección':'selecciones')+'</span>':'<button type="button" data-delta="-1" aria-label="Quitar uno">−</button><span aria-live="polite">'+cantidad+'</span><button type="button" data-delta="1" aria-label="Agregar uno">+</button>';
+      return '<article class="producto" data-id="'+id+'">'+fotoProducto(producto)+'<div class="producto-info"><h3>'+escapar(producto.Nombre)+'</h3><div class="precio">'+moneda(producto.Precio)+'</div><div class="unidad">'+escapar(producto.Unidad||'')+'</div></div><div class="cantidad">'+control+'</div></article>'
     }).join('');actualizarBarraCarrito();
   }
+  function contarProductoEnCarrito(id){return Object.values(carrito).filter(item=>String(item.ID_Producto)===String(id)).reduce((s,item)=>s+Number(item.Cantidad||0),0)}
   function cambiarCantidad(id,delta){
     const producto=catalogo.find(p=>String(p.ID_Producto)===String(id));if(!producto)return;
+    if(Number(producto.CantidadSabores||0)>0){abrirSelectorSabores(id);return}
     const actual=carrito[id]?.Cantidad||0;const nueva=Math.max(0,Math.min(99,actual+delta));if(nueva===0)delete carrito[id];else carrito[id]={...producto,Cantidad:nueva};guardarCarrito();
     const contador=document.querySelector('.producto[data-id="'+CSS.escape(String(id))+'"] .cantidad span');if(contador)contador.textContent=nueva;actualizarBarraCarrito();
   }
+  function categoriasPermitidas(producto){return String(producto.CategoriasSabores||'').split('|').map(x=>x.trim()).filter(Boolean)}
+  function abrirSelectorSabores(id){
+    const producto=catalogo.find(p=>String(p.ID_Producto)===String(id));if(!producto)return;
+    productoEnSeleccion=producto;seleccionEnCurso={};
+    const opciones=sabores.filter(s=>/^s[ií]$/i.test(String(s.Disponible||'Sí').trim())&&categoriasPermitidas(producto).includes(String(s.Categoria||'').trim()));
+    if(!opciones.length){mostrarMensaje('mensaje-catalogo','No hay sabores disponibles para esta promoción en este momento.','error');return}
+    $('titulo-selector-sabores').textContent=producto.Nombre;$('instruccion-selector-sabores').textContent='Elegí exactamente '+producto.CantidadSabores+' '+(Number(producto.CantidadSabores)===1?'paleta':'paletas')+'. Podés repetir sabores o combinarlos.';
+    $('lista-sabores').innerHTML=opciones.map(s=>'<article class="sabor" data-sabor-id="'+escapar(s.ID_Sabor)+'"><img class="sabor-foto" src="'+escapar(s.Foto||'')+'" alt="'+escapar(s.Nombre)+'" loading="lazy"><div><strong class="sabor-nombre">'+escapar(s.Nombre)+'</strong><span class="sabor-categoria">'+escapar(s.Categoria)+'</span><div class="sabor-controles"><button type="button" data-sabor-delta="-1" aria-label="Quitar '+escapar(s.Nombre)+'">−</button><span>0</span><button type="button" data-sabor-delta="1" aria-label="Agregar '+escapar(s.Nombre)+'">+</button></div></div></article>').join('');
+    actualizarSelectorSabores();$('modal-sabores').classList.add('visible');$('modal-sabores').setAttribute('aria-hidden','false');
+  }
+  function totalSeleccionSabores(){return Object.values(seleccionEnCurso).reduce((s,cantidad)=>s+Number(cantidad||0),0)}
+  function ajustarSabor(id,delta){
+    if(!productoEnSeleccion)return;const actual=Number(seleccionEnCurso[id]||0),total=totalSeleccionSabores(),maximo=Number(productoEnSeleccion.CantidadSabores||0);
+    if(delta>0&&total>=maximo)return;const nuevo=Math.max(0,actual+delta);if(nuevo===0)delete seleccionEnCurso[id];else seleccionEnCurso[id]=nuevo;actualizarSelectorSabores();
+  }
+  function actualizarSelectorSabores(){
+    const total=totalSeleccionSabores(),maximo=Number(productoEnSeleccion?.CantidadSabores||0),faltan=maximo-total;
+    document.querySelectorAll('.sabor').forEach(tarjeta=>{const id=tarjeta.dataset.saborId,cantidad=Number(seleccionEnCurso[id]||0);tarjeta.querySelector('.sabor-controles span').textContent=cantidad;tarjeta.querySelector('[data-sabor-delta="-1"]').disabled=cantidad===0;tarjeta.querySelector('[data-sabor-delta="1"]').disabled=total>=maximo});
+    $('resumen-selector-sabores').textContent=faltan>0?'Faltan '+faltan+' por elegir':'Selección completa';$('btn-agregar-combinacion').disabled=total!==maximo;
+  }
+  function agregarCombinacionSeleccionada(){
+    if(!productoEnSeleccion||totalSeleccionSabores()!==Number(productoEnSeleccion.CantidadSabores))return;
+    const seleccion=Object.entries(seleccionEnCurso).map(([id,cantidad])=>{const sabor=sabores.find(s=>String(s.ID_Sabor)===String(id));return {ID_Sabor:String(id),Nombre:String(sabor?.Nombre||''),Categoria:String(sabor?.Categoria||''),Cantidad:Number(cantidad)}}).filter(s=>s.Nombre&&s.Cantidad>0);
+    const firma=seleccion.slice().sort((a,b)=>a.ID_Sabor.localeCompare(b.ID_Sabor)).map(s=>s.ID_Sabor+':'+s.Cantidad).join('|'),clave=String(productoEnSeleccion.ID_Producto)+'#'+firma;
+    if(carrito[clave])carrito[clave].Cantidad+=1;else carrito[clave]={...productoEnSeleccion,Cantidad:1,Sabores:seleccion};guardarCarrito();cerrarSelectorSabores();dibujarCatalogo();
+  }
+  function cerrarSelectorSabores(){$('modal-sabores').classList.remove('visible');$('modal-sabores').setAttribute('aria-hidden','true');productoEnSeleccion=null;seleccionEnCurso={}}
+  function textoSabores(item){return Array.isArray(item.Sabores)&&item.Sabores.length?item.Sabores.map(s=>s.Nombre+' × '+s.Cantidad).join(' · '):''}
   function actualizarBarraCarrito(){
     const items=Object.values(carrito);const cantidad=items.reduce((s,item)=>s+Number(item.Cantidad),0);const subtotal=items.reduce((s,item)=>s+Number(item.Cantidad)*Number(item.Precio),0);
     $('barra-carrito').classList.toggle('visible',cantidad>0);$('resumen-carrito').textContent=cantidad+(cantidad===1?' producto':' productos');$('subtotal-carrito').textContent=moneda(subtotal);
   }
   function prepararCheckout(){
-    const items=Object.values(carrito);if(!items.length){mostrarMensaje('mensaje-catalogo','Agregá al menos un producto.','error');return}
-    let total=0;$('resumen-pedido').innerHTML=items.map(item=>{const subtotal=Number(item.Cantidad)*Number(item.Precio);total+=subtotal;return '<div class="resumen-item"><span>'+Number(item.Cantidad)+' × '+escapar(item.Nombre)+'<small class="ayuda">'+escapar(item.Unidad||'')+'</small></span><strong>'+moneda(subtotal)+'</strong></div>'}).join('');
+    const items=Object.entries(carrito);if(!items.length){mostrarMensaje('mensaje-catalogo','Agregá al menos un producto.','error');return}
+    let total=0;$('resumen-pedido').innerHTML=items.map(([clave,item])=>{const subtotal=Number(item.Cantidad)*Number(item.Precio),detalleSabores=textoSabores(item);total+=subtotal;return '<div class="resumen-item"><span>'+Number(item.Cantidad)+' × '+escapar(item.Nombre)+'<small class="ayuda">'+escapar(item.Unidad||'')+(detalleSabores?' · '+detalleSabores:'')+'</small><button class="btn-eliminar-linea" type="button" data-eliminar-linea="'+escapar(clave)+'">Quitar una selección</button></span><strong>'+moneda(subtotal)+'</strong></div>'}).join('');
     const minimo=Number(configuracion.MontoMinimo||0);if(minimo>0&&total<minimo){mostrarMensaje('mensaje-catalogo','El pedido mínimo es de '+moneda(minimo)+'. Agregá más productos para continuar.','error');return}
     $('total-pedido').textContent=moneda(total);$('nombre').value=clienteActual.nombre||'';$('direccion').value=clienteActual.direccion||'';mostrarMensaje('mensaje-checkout','');$('aviso-ubicacion').textContent='Al enviar, solicitaremos tu ubicación para organizar la ruta de entrega.';mostrarPaso('paso-checkout');
   }
+  function quitarLineaCarrito(clave){if(!carrito[clave])return;if(Number(carrito[clave].Cantidad)>1)carrito[clave].Cantidad-=1;else delete carrito[clave];guardarCarrito();if(Object.keys(carrito).length)prepararCheckout();else{dibujarCatalogo();mostrarPaso('paso-catalogo')}}
   function obtenerUbicacion(){return new Promise(resolve=>{if(!navigator.geolocation){resolve('');return}navigator.geolocation.getCurrentPosition(posicion=>resolve(posicion.coords.latitude.toFixed(6)+','+posicion.coords.longitude.toFixed(6)),()=>resolve(''),{enableHighAccuracy:true,timeout:10000,maximumAge:300000})})}
   async function enviarPedido(){
     const nombre=$('nombre').value.trim(),direccion=$('direccion').value.trim(),itemsCarrito=Object.values(carrito);
@@ -178,7 +223,7 @@
     const gps=await obtenerUbicacion()||clienteActual.gps||'';
     if(!gps){const continuar=window.confirm('No pudimos obtener tu ubicación. ¿Querés enviar el pedido solamente con la dirección escrita?');if(!continuar){boton.disabled=false;boton.textContent='Enviar pedido';$('aviso-ubicacion').textContent='Activá el permiso de ubicación del navegador y volvé a intentarlo.';return}}
     boton.textContent='Enviando pedido…';
-    const items=itemsCarrito.map(item=>({ID_Producto:item.ID_Producto,Nombre:item.Nombre,Cantidad:Number(item.Cantidad),Precio:Number(item.Precio)}));
+    const items=itemsCarrito.map(item=>({ID_Producto:item.ID_Producto,Cantidad:Number(item.Cantidad),Sabores:Array.isArray(item.Sabores)?item.Sabores.map(s=>({ID_Sabor:s.ID_Sabor,Cantidad:Number(s.Cantidad)})):[]}));
     try{
       const resultado=await apiJson(CONFIG_APP_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'guardarPedido',telefono:clienteActual.telefono,nombre,direccion,gps,items})});
       if(!resultado?.ok||!resultado?.idPedido)throw new Error('El servidor no confirmó el pedido.');
@@ -205,7 +250,10 @@
   $('telefono').addEventListener('input',evento=>{evento.target.value=formatearTelefono(evento.target.value)});
   $('telefono').addEventListener('keydown',evento=>{if(evento.key==='Enter')iniciarCompra()});
   $('btn-continuar').addEventListener('click',iniciarCompra);$('btn-consultar').addEventListener('click',consultarEstado);$('btn-ver-pedido').addEventListener('click',prepararCheckout);$('btn-enviar').addEventListener('click',enviarPedido);$('btn-estado-confirmado').addEventListener('click',consultarEstado);$('btn-nuevo-pedido').addEventListener('click',nuevoPedido);
-  $('lista-productos').addEventListener('click',evento=>{const boton=evento.target.closest('button[data-delta]');if(!boton)return;const producto=boton.closest('.producto');cambiarCantidad(producto.dataset.id,Number(boton.dataset.delta))});
+  $('lista-productos').addEventListener('click',evento=>{const botonSabores=evento.target.closest('button[data-elegir-sabores]');if(botonSabores){abrirSelectorSabores(botonSabores.dataset.elegirSabores);return}const boton=evento.target.closest('button[data-delta]');if(!boton)return;const producto=boton.closest('.producto');cambiarCantidad(producto.dataset.id,Number(boton.dataset.delta))});
+  $('lista-sabores').addEventListener('click',evento=>{const boton=evento.target.closest('button[data-sabor-delta]');if(!boton)return;ajustarSabor(boton.closest('.sabor').dataset.saborId,Number(boton.dataset.saborDelta))});
+  $('btn-cerrar-selector').addEventListener('click',cerrarSelectorSabores);$('btn-agregar-combinacion').addEventListener('click',agregarCombinacionSeleccionada);$('modal-sabores').addEventListener('click',evento=>{if(evento.target===$('modal-sabores'))cerrarSelectorSabores()});
+  $('resumen-pedido').addEventListener('click',evento=>{const boton=evento.target.closest('button[data-eliminar-linea]');if(boton)quitarLineaCarrito(boton.dataset.eliminarLinea)});
   document.querySelectorAll('[data-ir]').forEach(boton=>boton.addEventListener('click',()=>mostrarPaso(boton.dataset.ir)));
   const telefonoGuardado=localStorage.getItem('queMangoTelefono')||'';if(telefonoGuardado)$('telefono').value=formatearTelefono(telefonoGuardado);
 </script>
