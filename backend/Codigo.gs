@@ -43,6 +43,7 @@ function doPost(e) {
     if (!e || !e.postData || !e.postData.contents) throw new Error('Solicitud vacía.');
     const body = JSON.parse(e.postData.contents);
     if (body.action === 'guardarPedido') return jsonResponse(guardarPedido(body));
+    if (body.action === 'cancelarPedido') return jsonResponse(cancelarPedido(body));
     return jsonResponse({ error: 'Acción no reconocida.' });
   } catch (error) {
     console.error(error);
@@ -270,6 +271,39 @@ function estadoPedido(telefonoEntrada) {
     .filter(fila => normalizarTelefonoSeguro_(fila[1]) === telefono)
     .map(fila => objetoDesdeFila(encabezados, fila))
     .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
+}
+
+function cancelarPedido(body) {
+  const telefono = normalizarTelefono(body && body.telefono);
+  const idPedido = textoLimpio(body && body.idPedido, 80);
+  if (!idPedido) throw new Error('No se indicó el pedido que se desea cancelar.');
+
+  const bloqueo = LockService.getScriptLock();
+  bloqueo.waitLock(20000);
+  try {
+    const hoja = obtenerHoja(HOJAS.PEDIDOS);
+    const datos = hoja.getDataRange().getValues();
+    if (datos.length < 2) throw new Error('No encontramos ese pedido.');
+    const encabezados = datos[0];
+    const indiceId = encabezados.indexOf('ID_Pedido');
+    const indiceTelefono = encabezados.indexOf('Telefono');
+    const indiceEstado = encabezados.indexOf('Estado');
+    if (indiceId < 0 || indiceTelefono < 0 || indiceEstado < 0) throw new Error('La hoja de pedidos no tiene las columnas requeridas.');
+
+    const filas = [];
+    datos.slice(1).forEach((fila, indice) => {
+      if (String(fila[indiceId]) === idPedido && normalizarTelefonoSeguro_(fila[indiceTelefono]) === telefono) filas.push(indice + 2);
+    });
+    if (!filas.length) throw new Error('No encontramos un pedido tuyo con ese código.');
+    const estados = filas.map(numeroFila => String(hoja.getRange(numeroFila, indiceEstado + 1).getValue() || '').trim());
+    if (estados.some(estado => estado !== 'Recibido')) {
+      throw new Error('Este pedido ya no se puede cancelar porque está en proceso o ya fue cerrado.');
+    }
+    filas.forEach(numeroFila => hoja.getRange(numeroFila, indiceEstado + 1).setValue('Cancelado'));
+    return { ok: true, idPedido: idPedido, estado: 'Cancelado' };
+  } finally {
+    bloqueo.releaseLock();
+  }
 }
 
 function leerConfig_() {
