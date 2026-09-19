@@ -7,6 +7,7 @@ const HOJAS = Object.freeze({
   CLIENTES: 'Clientes',
   PEDIDOS: 'Pedidos',
   CONFIG: 'Config',
+  SABORES: 'Sabores',
   RESUMEN: 'Resumen'
 });
 
@@ -81,9 +82,9 @@ function textoLimpio(valor, maximo) {
 function obtenerCatalogo() {
   const hoja = obtenerHoja(HOJAS.PRODUCTOS);
   const datos = hoja.getDataRange().getValues();
-  if (datos.length < 2) return [];
+  if (datos.length < 2) return { productos: [], sabores: obtenerSabores_() };
   const encabezados = datos[0];
-  return datos.slice(1)
+  const productos = datos.slice(1)
     .map(fila => objetoDesdeFila(encabezados, fila))
     .filter(producto => /^s[ií]$/i.test(String(producto.Disponible).trim()))
     .map(producto => ({
@@ -91,7 +92,27 @@ function obtenerCatalogo() {
       Nombre: String(producto.Nombre),
       Precio: Number(producto.Precio),
       Unidad: String(producto.Unidad || ''),
-      Foto: String(producto.Foto || '')
+      Foto: String(producto.Foto || ''),
+      CantidadSabores: Math.max(0, Math.floor(Number(producto.CantidadSabores || 0))),
+      CategoriasSabores: String(producto.CategoriasSabores || '')
+    }));
+  return { productos, sabores: obtenerSabores_() };
+}
+
+function obtenerSabores_() {
+  const hoja = obtenerHoja(HOJAS.SABORES);
+  const datos = hoja.getDataRange().getValues();
+  if (datos.length < 2) return [];
+  const encabezados = datos[0];
+  return datos.slice(1)
+    .map(fila => objetoDesdeFila(encabezados, fila))
+    .filter(sabor => /^s[ií]$/i.test(String(sabor.Disponible).trim()))
+    .map(sabor => ({
+      ID_Sabor: String(sabor.ID_Sabor),
+      Categoria: String(sabor.Categoria || ''),
+      Nombre: String(sabor.Nombre || ''),
+      Foto: String(sabor.Foto || ''),
+      Disponible: String(sabor.Disponible || '')
     }));
 }
 
@@ -137,17 +158,20 @@ function guardarPedido(body) {
   const nombre = textoLimpio(body.nombre, 80);
   const direccion = textoLimpio(body.direccion, 300);
   const gps = validarGps_(body.gps);
+  const metodoPago = normalizarMetodoPago_(body.metodoPago);
   if (!nombre || !direccion) throw new Error('Nombre y dirección son obligatorios.');
   if (!Array.isArray(body.items) || !body.items.length) throw new Error('El carrito está vacío.');
 
-  const catalogo = obtenerCatalogo();
+  const catalogo = obtenerCatalogo().productos;
   const productos = new Map(catalogo.map(producto => [String(producto.ID_Producto), producto]));
+  const saboresDisponibles = new Map(obtenerSabores_().map(sabor => [String(sabor.ID_Sabor), sabor]));
   const items = body.items.map(item => {
     const producto = productos.get(String(item.ID_Producto));
     const cantidad = Math.floor(Number(item.Cantidad));
     if (!producto) throw new Error('Uno de los productos ya no está disponible.');
     if (!Number.isFinite(cantidad) || cantidad < 1 || cantidad > 99) throw new Error('Cantidad de producto inválida.');
-    return { producto, cantidad };
+    const sabores = validarSaboresPedido_(item.Sabores, producto, saboresDisponibles);
+    return { producto, cantidad, sabores };
   });
 
   const total = items.reduce((suma, item) => suma + item.cantidad * item.producto.Precio, 0);
@@ -172,15 +196,59 @@ function guardarPedido(body) {
       item.cantidad,
       item.producto.Precio,
       fecha,
-      'Recibido'
+      'Recibido',
+      formatoSabores_(item.sabores),
+      metodoPago
     ]);
-    hoja.getRange(hoja.getLastRow() + 1, 1, filas.length, 8).setValues(filas);
+    hoja.getRange(hoja.getLastRow() + 1, 1, filas.length, 10).setValues(filas);
   } finally {
     bloqueo.releaseLock();
   }
 
-  notificarPedido_(config, { idPedido, telefono, nombre, direccion, items, total });
-  return { ok: true, idPedido, total };
+  notificarPedido_(config, { idPedido, telefono, nombre, direccion, metodoPago, items, total });
+  return { ok: true, idPedido, total, metodoPago };
+}
+
+function normalizarMetodoPago_(valor) {
+  const metodo = String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  if (metodo === 'sinpe movil') return 'SINPE Móvil';
+  if (metodo === 'efectivo') return 'Efectivo';
+  throw new Error('La forma de pago no es válida.');
+}
+
+function validarSaboresPedido_(seleccion, producto, saboresDisponibles) {
+  const requeridos = Math.max(0, Math.floor(Number(producto.CantidadSabores || 0)));
+  if (!requeridos) return [];
+  if (!Array.isArray(seleccion) || !seleccion.length) {
+    throw new Error('Debés elegir los sabores de cada promoción de paletas.');
+  }
+  const categoriasPermitidas = String(producto.CategoriasSabores || '')
+    .split('|').map(valor => valor.trim()).filter(Boolean);
+  const acumulado = new Map();
+  seleccion.forEach(item => {
+    const id = String(item && item.ID_Sabor || '');
+    const cantidad = Math.floor(Number(item && item.Cantidad));
+    const sabor = saboresDisponibles.get(id);
+    if (!sabor || !Number.isFinite(cantidad) || cantidad < 1) {
+      throw new Error('La selección de sabores no es válida.');
+    }
+    if (categoriasPermitidas.length && categoriasPermitidas.indexOf(sabor.Categoria) === -1) {
+      throw new Error('Uno de los sabores no corresponde a esta promoción.');
+    }
+    acumulado.set(id, (acumulado.get(id) || 0) + cantidad);
+  });
+  const total = Array.from(acumulado.values()).reduce((suma, cantidad) => suma + cantidad, 0);
+  if (total !== requeridos) {
+    throw new Error('Esta promoción requiere exactamente ' + requeridos + ' paleta(s) seleccionada(s).');
+  }
+  return Array.from(acumulado.entries()).map(([id, cantidad]) => {
+    const sabor = saboresDisponibles.get(id);
+    return { ID_Sabor: id, Nombre: sabor.Nombre, Categoria: sabor.Categoria, Cantidad: cantidad };
+  });
+}
+
+function formatoSabores_(sabores) {
+  return (sabores || []).map(sabor => sabor.Nombre + ' × ' + sabor.Cantidad).join(' · ');
 }
 
 function validarGps_(valor) {
@@ -221,7 +289,8 @@ function obtenerConfiguracionPublica() {
     PedidosAbiertos: !/^no$/i.test(String(config.PedidosAbiertos || 'Si').trim()),
     FechaCorte: config.FechaCorte || '',
     MontoMinimo: Number(config.MontoMinimo || 0),
-    WhatsAppNegocio: String(config.WhatsAppNegocio || '').replace(/\D/g, '')
+    WhatsAppNegocio: String(config.WhatsAppNegocio || '').replace(/\D/g, ''),
+    SinpeMovil: String(config.SinpeMovil || '63650575').replace(/\D/g, '').replace(/^506/, '')
   };
 }
 
@@ -286,7 +355,8 @@ function notificarPedido_(config, pedido) {
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) return;
   const detalle = pedido.items.map(item =>
     '- ' + item.cantidad + ' × ' + item.producto.Nombre + ' = ₡' +
-    (item.cantidad * item.producto.Precio).toLocaleString('es-CR')
+    (item.cantidad * item.producto.Precio).toLocaleString('es-CR') +
+    (item.sabores && item.sabores.length ? '\n  Sabores: ' + formatoSabores_(item.sabores) : '')
   ).join('\n');
   const mensaje = [
     'Nuevo pedido recibido',
@@ -295,6 +365,7 @@ function notificarPedido_(config, pedido) {
     'Cliente: ' + pedido.nombre,
     'WhatsApp: ' + pedido.telefono,
     'Dirección: ' + pedido.direccion,
+    'Pago: ' + pedido.metodoPago + (pedido.metodoPago === 'SINPE Móvil' ? ' (' + String(config.SinpeMovil || '63650575').replace(/\D/g, '').replace(/^506/, '').replace(/(\d{4})(\d{4})/, '$1-$2') + ')' : ''),
     '',
     detalle,
     '',
