@@ -50,6 +50,7 @@
   .resumen-item{display:flex;justify-content:space-between;gap:1rem;padding:.65rem 0;border-bottom:1px solid var(--borde)}
   .btn-eliminar-linea{margin-top:.42rem;border:0;background:transparent;color:var(--error);padding:0;font-size:.78rem;font-weight:700;cursor:pointer}
   .total{display:flex;justify-content:space-between;margin-top:.85rem;font-size:1.12rem;font-weight:800}
+  .metodos-pago{display:grid;gap:.65rem}.opcion-pago{display:flex;align-items:flex-start;gap:.72rem;padding:.8rem;border:2px solid var(--borde);border-radius:10px;background:var(--blanco);cursor:pointer}.opcion-pago:has(input:checked){border-color:var(--verde);background:var(--verde-suave)}.opcion-pago input{width:19px;height:19px;margin:.12rem 0 0;accent-color:var(--verde)}.pago-titulo{display:flex;align-items:center;gap:.45rem;color:var(--verde-oscuro);font-weight:800}.pago-sinpe-logo{width:82px;height:auto;object-fit:contain;background:#fff;border-radius:4px}.pago-detalle{display:block;margin-top:.18rem;color:var(--gris);font-size:.8rem}
   .aviso{margin-bottom:1rem;padding:.8rem .9rem;border:1px solid var(--mostaza);border-radius:8px;background:#FFF8E8;color:#6B5218;font-size:.85rem}
   .confirmacion{text-align:center;padding:1.75rem 1rem}.confirmacion-icono{width:64px;height:64px;display:grid;place-items:center;margin:0 auto .8rem;border-radius:50%;background:var(--verde-suave);color:var(--exito);font-size:2rem;font-weight:800}
   .codigo-pedido{display:inline-block;margin:.8rem 0;padding:.5rem .75rem;border-radius:7px;background:var(--crema);color:var(--verde-oscuro);font-weight:800;word-break:break-all}
@@ -94,6 +95,10 @@
       <hr style="border:0;border-top:1px solid var(--borde);margin:1.2rem 0">
       <div class="campo"><label for="nombre">Nombre completo</label><input type="text" id="nombre" autocomplete="name" maxlength="80"></div>
       <div class="campo"><label for="direccion">Dirección y referencias</label><textarea id="direccion" autocomplete="street-address" maxlength="300" placeholder="Provincia, cantón, distrito y una referencia clara"></textarea></div>
+      <fieldset class="campo" style="border:0;padding:0"><legend>Forma de pago</legend><div class="metodos-pago">
+        <label class="opcion-pago"><input type="radio" name="metodo-pago" value="SINPE Móvil" checked><span><span class="pago-titulo"><img class="pago-sinpe-logo" src="images/pagos/sinpe-movil-oficial.png" alt="SINPE Móvil"> SINPE Móvil</span><span class="pago-detalle" id="detalle-sinpe">Transferí al 6365-0575 antes de enviar el pedido.</span></span></label>
+        <label class="opcion-pago"><input type="radio" name="metodo-pago" value="Efectivo"><span><span class="pago-titulo">Efectivo</span><span class="pago-detalle">Pago contra entrega.</span></span></label>
+      </div></fieldset>
       <div class="aviso" id="aviso-ubicacion">Al enviar, solicitaremos tu ubicación para organizar la ruta de entrega.</div>
       <div id="mensaje-checkout" class="estado-mensaje" role="alert"></div>
       <button id="btn-enviar" class="btn btn-primario btn-bloque" type="button">Enviar pedido</button>
@@ -107,7 +112,7 @@
   <section id="paso-confirmado" class="paso"><div class="tarjeta confirmacion">
     <div class="confirmacion-icono" aria-hidden="true">✓</div><h2>Pedido recibido</h2>
     <p>Guardá este código para identificar tu pedido:</p><div id="codigo-pedido" class="codigo-pedido"></div>
-    <p>Podés consultar el estado usando tu mismo número de WhatsApp.</p>
+    <p id="pago-confirmado">Podés consultar el estado usando tu mismo número de WhatsApp.</p>
     <a id="link-whatsapp" class="btn btn-mostaza oculto" href="#" target="_blank" rel="noopener">Avisar por WhatsApp</a>
     <div class="acciones" style="justify-content:center;margin-top:1rem"><button class="btn btn-secundario" type="button" id="btn-estado-confirmado">Consultar estado</button>
       <button class="btn btn-primario" type="button" id="btn-nuevo-pedido">Hacer otro pedido</button></div>
@@ -121,13 +126,14 @@
   let catalogo=[],sabores=[];
   let carrito=cargarCarrito();
   let clienteActual={telefono:'',nombre:'',direccion:'',gps:''};
-  let configuracion={PedidosAbiertos:true,MontoMinimo:0,WhatsAppNegocio:''};
+  let configuracion={PedidosAbiertos:true,MontoMinimo:0,WhatsAppNegocio:'',SinpeMovil:'63650575'};
   let productoEnSeleccion=null,seleccionEnCurso={};
   const $=id=>document.getElementById(id);
   const moneda=valor=>'₡'+Number(valor||0).toLocaleString('es-CR');
   function escapar(valor){return String(valor??'').replace(/[&<>"']/g,caracter=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[caracter]))}
   function telefonoNormalizado(valor){let digitos=String(valor||'').replace(/\D/g,'');if(digitos.length===11&&digitos.startsWith('506'))digitos=digitos.slice(3);return digitos.length===8?digitos:''}
-  function formatearTelefono(valor){const digitos=String(valor||'').replace(/\D/g,'').slice(0,8);return digitos.length>4?digitos.slice(0,4)+'-'+digitos.slice(4):digitos}
+  function formatearTelefono(valor){let digitos=String(valor||'').replace(/\D/g,'');if(digitos.length===11&&digitos.startsWith('506'))digitos=digitos.slice(3);digitos=digitos.slice(0,8);return digitos.length>4?digitos.slice(0,4)+'-'+digitos.slice(4):digitos}
+  function formatearNumeroPago(valor){return formatearTelefono(String(valor||'').replace(/^506/,''))}
   function mostrarMensaje(id,texto,tipo='info'){const elemento=$(id);elemento.textContent=texto||'';elemento.className='estado-mensaje'+(texto?' visible '+tipo:'')}
   function mostrarPaso(id){document.querySelectorAll('.paso').forEach(paso=>paso.classList.remove('activo'));$(id).classList.add('activo');window.scrollTo({top:0,behavior:'smooth'})}
   async function apiJson(url,opciones={},intento=0){
@@ -211,23 +217,25 @@
     const items=Object.entries(carrito);if(!items.length){mostrarMensaje('mensaje-catalogo','Agregá al menos un producto.','error');return}
     let total=0;$('resumen-pedido').innerHTML=items.map(([clave,item])=>{const subtotal=Number(item.Cantidad)*Number(item.Precio),detalleSabores=textoSabores(item);total+=subtotal;return '<div class="resumen-item"><span>'+Number(item.Cantidad)+' × '+escapar(item.Nombre)+'<small class="ayuda">'+escapar(item.Unidad||'')+(detalleSabores?' · '+detalleSabores:'')+'</small><button class="btn-eliminar-linea" type="button" data-eliminar-linea="'+escapar(clave)+'">Quitar una selección</button></span><strong>'+moneda(subtotal)+'</strong></div>'}).join('');
     const minimo=Number(configuracion.MontoMinimo||0);if(minimo>0&&total<minimo){mostrarMensaje('mensaje-catalogo','El pedido mínimo es de '+moneda(minimo)+'. Agregá más productos para continuar.','error');return}
-    $('total-pedido').textContent=moneda(total);$('nombre').value=clienteActual.nombre||'';$('direccion').value=clienteActual.direccion||'';mostrarMensaje('mensaje-checkout','');$('aviso-ubicacion').textContent='Al enviar, solicitaremos tu ubicación para organizar la ruta de entrega.';mostrarPaso('paso-checkout');
+    $('total-pedido').textContent=moneda(total);$('nombre').value=clienteActual.nombre||'';$('direccion').value=clienteActual.direccion||'';actualizarInfoPago();mostrarMensaje('mensaje-checkout','');$('aviso-ubicacion').textContent='Al enviar, solicitaremos tu ubicación para organizar la ruta de entrega.';mostrarPaso('paso-checkout');
   }
+  function actualizarInfoPago(){const numero=formatearNumeroPago(configuracion.SinpeMovil||'63650575');$('detalle-sinpe').textContent='Transferí al '+numero+' antes de enviar el pedido.'}
   function quitarLineaCarrito(clave){if(!carrito[clave])return;if(Number(carrito[clave].Cantidad)>1)carrito[clave].Cantidad-=1;else delete carrito[clave];guardarCarrito();if(Object.keys(carrito).length)prepararCheckout();else{dibujarCatalogo();mostrarPaso('paso-catalogo')}}
   function obtenerUbicacion(){return new Promise(resolve=>{if(!navigator.geolocation){resolve('');return}navigator.geolocation.getCurrentPosition(posicion=>resolve(posicion.coords.latitude.toFixed(6)+','+posicion.coords.longitude.toFixed(6)),()=>resolve(''),{enableHighAccuracy:true,timeout:10000,maximumAge:300000})})}
   async function enviarPedido(){
-    const nombre=$('nombre').value.trim(),direccion=$('direccion').value.trim(),itemsCarrito=Object.values(carrito);
+    const nombre=$('nombre').value.trim(),direccion=$('direccion').value.trim(),itemsCarrito=Object.values(carrito),metodoPago=document.querySelector('input[name="metodo-pago"]:checked')?.value||'';
     if(!nombre||!direccion){mostrarMensaje('mensaje-checkout','Completá tu nombre y la dirección de entrega.','error');(!nombre?$('nombre'):$('direccion')).focus();return}
     if(!itemsCarrito.length){mostrarMensaje('mensaje-checkout','El carrito está vacío.','error');return}
+    if(!['SINPE Móvil','Efectivo'].includes(metodoPago)){mostrarMensaje('mensaje-checkout','Elegí una forma de pago válida.','error');return}
     const boton=$('btn-enviar');boton.disabled=true;boton.textContent='Obteniendo ubicación…';mostrarMensaje('mensaje-checkout','');
     const gps=await obtenerUbicacion()||clienteActual.gps||'';
     if(!gps){const continuar=window.confirm('No pudimos obtener tu ubicación. ¿Querés enviar el pedido solamente con la dirección escrita?');if(!continuar){boton.disabled=false;boton.textContent='Enviar pedido';$('aviso-ubicacion').textContent='Activá el permiso de ubicación del navegador y volvé a intentarlo.';return}}
     boton.textContent='Enviando pedido…';
     const items=itemsCarrito.map(item=>({ID_Producto:item.ID_Producto,Cantidad:Number(item.Cantidad),Sabores:Array.isArray(item.Sabores)?item.Sabores.map(s=>({ID_Sabor:s.ID_Sabor,Cantidad:Number(s.Cantidad)})):[]}));
     try{
-      const resultado=await apiJson(CONFIG_APP_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'guardarPedido',telefono:clienteActual.telefono,nombre,direccion,gps,items})});
+      const resultado=await apiJson(CONFIG_APP_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'guardarPedido',telefono:clienteActual.telefono,nombre,direccion,gps,metodoPago,items})});
       if(!resultado?.ok||!resultado?.idPedido)throw new Error('El servidor no confirmó el pedido.');
-      clienteActual={...clienteActual,nombre,direccion,gps};carrito={};guardarCarrito();$('codigo-pedido').textContent=resultado.idPedido;configurarWhatsApp(nombre,resultado.idPedido);mostrarPaso('paso-confirmado');
+      clienteActual={...clienteActual,nombre,direccion,gps};carrito={};guardarCarrito();$('codigo-pedido').textContent=resultado.idPedido;$('pago-confirmado').textContent='Forma de pago: '+metodoPago+'. Podés consultar el estado usando tu mismo número de WhatsApp.';configurarWhatsApp(nombre,resultado.idPedido);mostrarPaso('paso-confirmado');
     }catch(error){mostrarMensaje('mensaje-checkout',error.message||'No se pudo enviar el pedido. Intentá nuevamente.','error')}
     finally{boton.disabled=false;boton.textContent='Enviar pedido'}
   }
